@@ -37,12 +37,14 @@ upload them in the Blogger editor.
 
 1. `python app.py` (or double-click `start.bat` on Windows). It opens
    `http://localhost:8822` in your browser.
-2. Follow the in-app wizard:
-   - Create a project in [Google Cloud Console](https://console.cloud.google.com/projectcreate)
+2. Follow the in-app wizard. On the current (2025–2026) Google Cloud Console
+   the old "OAuth consent screen" now lives under **Google Auth Platform**:
+   - Create a project in [Google Cloud Console](https://console.cloud.google.com/projectcreate) and switch to it
    - Enable [Blogger API v3](https://console.cloud.google.com/apis/library/blogger.googleapis.com)
-   - Configure the OAuth consent screen (External), add your own Gmail as a test user
-   - Create an OAuth client ID of type **Desktop app**
-   - Paste the Client ID + Secret into the page and authorize once
+   - Open [Google Auth Platform](https://console.cloud.google.com/auth/overview) → **Get started**: app name, support email, Audience = **External**, contact email
+   - **Critical:** on the **Audience** tab, add your own Gmail under **Test users** (skip this and authorization will fail)
+   - On the **Clients** tab → **Create client** → application type **Desktop app**
+   - Paste the Client ID + Secret into the page and authorize once (if you see "Google hasn't verified this app", click Advanced → Go to … — it's your own test app)
 3. Pick which blog to publish to. Done — credentials are saved to a local
    `config.json` (git-ignored) and you won't need to sign in again.
 
@@ -108,12 +110,14 @@ JSON，轉成**全 inline style** 的 Blogger-safe HTML（這樣 Blogger 佈景�
 
 1. 執行 `python app.py`（Windows 可雙擊 `start.bat`），會自動開啟
    `http://localhost:8822`。
-2. 跟著頁面上的精靈操作：
-   - 在 [Google Cloud Console](https://console.cloud.google.com/projectcreate) 建立專案
+2. 跟著頁面上的精靈操作。注意 Google 在 2025–2026 改版，舊的「OAuth 同意畫面」
+   已整併進「**Google 驗證平台**」（第一次進去會跳「開始使用」精靈）：
+   - 在 [Google Cloud Console](https://console.cloud.google.com/projectcreate) 建立專案並切換過去
    - 啟用 [Blogger API v3](https://console.cloud.google.com/apis/library/blogger.googleapis.com)
-   - 設定 OAuth 同意畫面（選 External），把自己的 Gmail 加入「測試使用者」
-   - 建立類型為「**電腦版應用程式**」的 OAuth 用戶端 ID
-   - 把 Client ID + Secret 貼進頁面，授權一次
+   - 開 [Google 驗證平台](https://console.cloud.google.com/auth/overview) →「開始使用」：填應用程式名稱、支援信箱，目標對象選「**外部**」，填聯絡 email
+   - **最關鍵：** 到「**目標對象**」分頁，把自己的 Gmail 加入「**測試使用者**」（漏了必定授權失敗）
+   - 到「**用戶端**」分頁 →「建立用戶端」→ 應用程式類型選「**電腦版應用程式**」
+   - 把 Client ID + Secret 貼進頁面，授權一次（若出現「Google 尚未驗證這個應用程式」，按「進階 → 前往…」即可，因為是你自己的測試應用程式）
 3. 選擇要發布到哪個網誌。完成 —— 憑證會存進本機的 `config.json`（已被 git 忽略），
    之後不必再登入。
 

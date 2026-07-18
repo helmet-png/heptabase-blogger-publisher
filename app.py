@@ -281,17 +281,49 @@ label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
 <header>Hepta → Blogger <small>Heptabase 卡片一鍵推成 Blogger 草稿</small></header>
 <main>
 <div class="card" id="setup" style="display:none">
-  <h3>初始設定（只需一次）</h3>
-  <ol class="steps">
-    <li>開 <a href="https://console.cloud.google.com/projectcreate" target="_blank">Google Cloud Console</a> 建立專案（名稱隨意）。</li>
-    <li>到 <a href="https://console.cloud.google.com/apis/library/blogger.googleapis.com" target="_blank">API Library — Blogger API v3</a> 按「啟用」。</li>
-    <li>到「OAuth 同意畫面」：選 External、填 App 名稱、把自己的 Gmail 加入「測試使用者」。</li>
-    <li>到「憑證」→ 建立憑證 → OAuth 用戶端 ID → 應用程式類型選「<b>電腦版應用程式</b>」→ 建立。</li>
-    <li>把 Client ID 與 Client Secret 貼到下面（或直接貼下載的 JSON 全文）。</li>
+  <h3>初始設定（只需一次，約 10 分鐘）</h3>
+  <p style="background:#fff9db;border-left:3px solid #fab005;border-radius:3px;padding:8px 12px;margin:0 0 14px;font-size:13px">
+    Google 在 2025–2026 改版：舊的「OAuth 同意畫面」已整併進「<b>Google 驗證平台</b>」，
+    分成「品牌宣傳／目標對象／用戶端」等分頁。第一次進去會先跳「<b>開始使用</b>」精靈。
+    以下依目前中文版介面撰寫；左上角記得先確認「專案」選的是你剛建立的那個。
+  </p>
+
+  <p style="margin:14px 0 4px"><b>第一階段 · 建立專案並啟用 API</b></p>
+  <ol class="steps" style="margin-top:4px">
+    <li>開 <a href="https://console.cloud.google.com/projectcreate" target="_blank">建立專案</a>，名稱隨意 → 建立，並在頂端切換到這個專案。</li>
+    <li>開 <a href="https://console.cloud.google.com/apis/library/blogger.googleapis.com" target="_blank">Blogger API v3</a>，按藍色「<b>啟用</b>」。</li>
   </ol>
+
+  <p style="margin:14px 0 4px"><b>第二階段 · 設定 Google 驗證平台</b></p>
+  <ol class="steps" style="margin-top:4px">
+    <li>開 <a href="https://console.cloud.google.com/auth/overview" target="_blank">Google 驗證平台</a>。第一次會看到「<b>開始使用</b>」：
+      <ul style="margin:4px 0">
+        <li>應用程式名稱：隨意（例：Hepta Blogger）；使用者支援電子郵件：選你的 Gmail。</li>
+        <li>目標對象（Audience）：選「<b>外部</b>」。</li>
+        <li>聯絡資訊：填你的 email → 同意條款 → 建立。</li>
+      </ul>
+    </li>
+    <li><b style="color:#c5221f">最關鍵的一步（漏了必定授權失敗）：</b>
+      到 <a href="https://console.cloud.google.com/auth/audience" target="_blank">目標對象</a> 分頁，
+      在「<b>測試使用者</b>」按「新增使用者」→ 加入你自己的 Gmail → 儲存。
+    </li>
+  </ol>
+
+  <p style="margin:14px 0 4px"><b>第三階段 · 建立 OAuth 用戶端</b></p>
+  <ol class="steps" style="margin-top:4px">
+    <li>到 <a href="https://console.cloud.google.com/auth/clients" target="_blank">用戶端</a> 分頁 → 「<b>建立用戶端</b>」。</li>
+    <li>應用程式類型選「<b>電腦版應用程式</b>」→ 建立。（桌面版會自動允許 localhost 回呼，不必填網址）</li>
+    <li>建立後點該用戶端，複製「<b>用戶端 ID</b>」與「<b>用戶端密鑰</b>」貼到下面（或直接把「下載 JSON」的整份內容貼進第一格也行）。</li>
+  </ol>
+
   <label>Client ID（或整份 client_secret JSON）</label><input type="text" id="cid">
   <label>Client Secret</label><input type="password" id="csec">
   <p><button onclick="saveClient()">儲存並前往 Google 授權</button> <span id="setupMsg" class="err"></span></p>
+  <p style="font-size:12px;color:#888;margin-top:10px">
+    授權時若出現「Google 尚未驗證這個應用程式」，按「進階 → 前往 (你的應用程式名稱)（不安全）」即可——
+    因為這是你自己建、只給自己用的測試應用程式。<br>
+    註：測試狀態下 Google 的授權每 7 天會過期，屆時回到本頁重新授權一次即可。
+  </p>
 </div>
 
 <div class="card" id="blogpick" style="display:none">
