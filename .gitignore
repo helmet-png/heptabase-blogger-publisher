@@ -1,0 +1,8 @@
+# 絕不上傳：含 OAuth client_secret / refresh_token
+config.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
