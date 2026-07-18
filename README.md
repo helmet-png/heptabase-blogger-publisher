@@ -48,6 +48,21 @@ upload them in the Blogger editor.
 3. Pick which blog to publish to. Done — credentials are saved to a local
    `config.json` (git-ignored) and you won't need to sign in again.
 
+### Stop the 7-day re-authorization (publish to production)
+
+While the app's publishing status is **Testing**, Google expires your refresh
+token every 7 days, so you'd have to re-authorize weekly. To make it permanent:
+
+- Open [Google Auth Platform → Audience](https://console.cloud.google.com/auth/audience)
+- Under **Publishing status**, click **Publish app** and confirm → status becomes **In production**
+
+Refresh tokens then stop expiring. Because the Blogger scope is a "sensitive"
+scope, an app in production that you haven't submitted for Google's review stays
+**unverified**: it still works fine for personal use (just click through the
+"Google hasn't verified this app" warning the first time) and is capped at 100
+users. You only need Google's full verification (which takes weeks) if you want
+to remove that warning or let strangers use it — not needed for your own use.
+
 ## Usage
 
 1. Make sure the Heptabase desktop app is open.
@@ -120,6 +135,20 @@ JSON，轉成**全 inline style** 的 Blogger-safe HTML（這樣 Blogger 佈景�
    - 把 Client ID + Secret 貼進頁面，授權一次（若出現「Google 尚未驗證這個應用程式」，按「進階 → 前往…」即可，因為是你自己的測試應用程式）
 3. 選擇要發布到哪個網誌。完成 —— 憑證會存進本機的 `config.json`（已被 git 忽略），
    之後不必再登入。
+
+### 解除每 7 天重新授權（發布成正式版）
+
+當應用程式的發布狀態還是「**測試中**」時，Google 每 7 天會讓 refresh token 過期，
+你就得每週重新授權一次。要一勞永逸：
+
+- 開 [Google 驗證平台 → 目標對象](https://console.cloud.google.com/auth/audience)
+- 在「**發布狀態**」按「**發布應用程式**」並確認 → 狀態變成「**正式版**」
+
+之後 refresh token 就不再過期。由於 Blogger 屬「敏感範圍」，正式版但你尚未送交
+Google 審查的應用程式會維持「**未驗證**」狀態：個人自用完全正常（第一次授權時把
+「Google 尚未驗證這個應用程式」的警告按過去即可），上限 100 位使用者。只有當你想
+移除那個警告、或開放給陌生人使用時，才需要跑 Google 那套要數週的正式驗證 —— 自己
+用不需要。
 
 ### 使用
 

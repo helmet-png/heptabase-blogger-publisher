@@ -322,7 +322,9 @@ label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
   <p style="font-size:12px;color:#888;margin-top:10px">
     授權時若出現「Google 尚未驗證這個應用程式」，按「進階 → 前往 (你的應用程式名稱)（不安全）」即可——
     因為這是你自己建、只給自己用的測試應用程式。<br>
-    註：測試狀態下 Google 的授權每 7 天會過期，屆時回到本頁重新授權一次即可。
+    註：測試狀態下 Google 的授權每 7 天會過期。想一勞永逸，到
+    <a href="https://console.cloud.google.com/auth/audience" target="_blank">目標對象</a>
+    分頁按「發布應用程式」把狀態改成「正式版」，token 就不再過期（個人自用不需送 Google 驗證）。
   </p>
 </div>
 
