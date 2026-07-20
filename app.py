@@ -94,7 +94,7 @@ def image_placeholder(node):
     a = node.get("attrs") or {}
     label = a.get("alt") or a.get("title") or ""
     return ('<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;color:#888;margin:12px 0">'
-            f'🖼 圖片未匯入{("：" + esc(label)) if label else ""}（請在 Blogger 編輯器手動上傳）</div>')
+            f'圖片未匯入{("：" + esc(label)) if label else ""}（請在 Blogger 編輯器手動上傳）</div>')
 
 def render_inline(nodes, state):
     out = []
@@ -180,7 +180,7 @@ def render_block(n, state):
         return f'<p style="margin:0 0 12px;border-bottom:1px dashed #999;display:inline-block">{esc(title)}</p>'
     if t == "embed":
         return (f'<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;color:#888;margin:12px 0">'
-                f'📎 嵌入內容（{esc(a.get("objectType", "object"))}）未匯入</div>')
+                f'嵌入內容（{esc(a.get("objectType", "object"))}）未匯入</div>')
     if t in LIST_KINDS:
         return render_list(t, [n], state)
     return render_blocks(n.get("content"), state)
@@ -258,31 +258,39 @@ def api(path, data=None):
 PAGE = """<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hepta → Blogger</title><style>
-body{font-family:"Segoe UI","Microsoft JhengHei",sans-serif;margin:0;background:#f4f5f7;color:#222}
-header{background:#1a73e8;color:#fff;padding:10px 20px;font-size:18px;font-weight:600}
-header small{font-weight:400;opacity:.85;margin-left:10px}
-main{max-width:1100px;margin:16px auto;padding:0 16px}
-.card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.12);padding:16px 20px;margin-bottom:16px}
+:root{--bg:#f7f7f5;--card:#ffffff;--line:#e4e4e0;--line2:#c9c9c3;--text:#1c1c1a;--dim:#6e6e68;--ok:#15734f;--bad:#b3261e;--warn:#7a4b0a;--warn-bg:#faeeda}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#151515;--card:#1e1e1e;--line:#333330;--line2:#4c4c47;--text:#ebebe8;--dim:#a2a29b;--ok:#59c99a;--bad:#f08579;--warn:#e8b35c;--warn-bg:#3a2d14}}
+:root[data-theme=dark]{--bg:#151515;--card:#1e1e1e;--line:#333330;--line2:#4c4c47;--text:#ebebe8;--dim:#a2a29b;--ok:#59c99a;--bad:#f08579;--warn:#e8b35c;--warn-bg:#3a2d14}
+body{font-family:"Segoe UI","Microsoft JhengHei",system-ui,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px clamp(16px,3vw,40px);border-bottom:1px solid var(--line);font-size:16px;font-weight:500}
+header small{font-weight:400;color:var(--dim);margin-left:10px;font-size:13px}
+main{margin:16px 0;padding:0 clamp(16px,3vw,40px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:14px}
 input,button{font:inherit}
-input[type=text],input[type=password]{width:100%;box-sizing:border-box;padding:8px;border:1px solid #ccc;border-radius:4px}
-button{background:#1a73e8;color:#fff;border:none;border-radius:4px;padding:8px 18px;cursor:pointer}
-button:disabled{background:#aaa}
-button.ghost{background:#fff;color:#1a73e8;border:1px solid #1a73e8}
+input[type=text],input[type=password]{width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--text)}
+button{background:transparent;color:var(--text);border:1px solid var(--line2);border-radius:8px;padding:8px 18px;cursor:pointer}
+button:hover:not(:disabled){background:var(--bg)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.ghost{color:var(--dim);border-color:var(--line)}
+button.primary{background:var(--text);color:var(--card);border-color:var(--text)}
+a{color:var(--text)}
 ol.steps li{margin:6px 0}
-#results div{padding:7px 10px;border-radius:4px;cursor:pointer}
-#results div:hover{background:#eef3fd}
-#results div.sel{background:#dbe7fb}
+.tip{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 12px;margin:0 0 14px;font-size:13px}
+#results div{padding:7px 10px;border-radius:8px;cursor:pointer}
+#results div:hover{background:var(--bg)}
+#results div.sel{background:var(--line)}
 .cols{display:flex;gap:16px;flex-wrap:wrap}
 .cols>div{flex:1 1 320px}
-iframe{width:100%;height:460px;border:1px solid #ddd;border-radius:4px;background:#fff}
-.ok{color:#188038}.err{color:#c5221f;white-space:pre-wrap}
-label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
+iframe{width:100%;height:460px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.ok{color:var(--ok)}.err{color:var(--bad);white-space:pre-wrap}
+label{font-size:13px;color:var(--dim);display:block;margin:10px 0 4px}
 </style></head><body>
-<header>Hepta → Blogger <small>Heptabase 卡片一鍵推成 Blogger 草稿</small></header>
+<header><span>Hepta → Blogger <small>Heptabase 卡片一鍵推成 Blogger 草稿</small></span>
+<button class="ghost" id="theme-btn" onclick="cycleTheme()">主題：自動</button></header>
 <main>
 <div class="card" id="setup" style="display:none">
   <h3>初始設定（只需一次，約 10 分鐘）</h3>
-  <p style="background:#fff9db;border-left:3px solid #fab005;border-radius:3px;padding:8px 12px;margin:0 0 14px;font-size:13px">
+  <p class="tip">
     Google 在 2025–2026 改版：舊的「OAuth 同意畫面」已整併進「<b>Google 驗證平台</b>」，
     分成「品牌宣傳／目標對象／用戶端」等分頁。第一次進去會先跳「<b>開始使用</b>」精靈。
     以下依目前中文版介面撰寫；左上角記得先確認「專案」選的是你剛建立的那個。
@@ -303,7 +311,7 @@ label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
         <li>聯絡資訊：填你的 email → 同意條款 → 建立。</li>
       </ul>
     </li>
-    <li><b style="color:#c5221f">最關鍵的一步（漏了必定授權失敗）：</b>
+    <li><b style="color:var(--bad)">最關鍵的一步（漏了必定授權失敗）：</b>
       到 <a href="https://console.cloud.google.com/auth/audience" target="_blank">目標對象</a> 分頁，
       在「<b>測試使用者</b>」按「新增使用者」→ 加入你自己的 Gmail → 儲存。
     </li>
@@ -318,8 +326,8 @@ label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
 
   <label>Client ID（或整份 client_secret JSON）</label><input type="text" id="cid">
   <label>Client Secret</label><input type="password" id="csec">
-  <p><button onclick="saveClient()">儲存並前往 Google 授權</button> <span id="setupMsg" class="err"></span></p>
-  <p style="font-size:12px;color:#888;margin-top:10px">
+  <p><button class="primary" onclick="saveClient()">儲存並前往 Google 授權</button> <span id="setupMsg" class="err"></span></p>
+  <p style="font-size:12px;color:var(--dim);margin-top:10px">
     授權時若出現「Google 尚未驗證這個應用程式」，按「進階 → 前往 (你的應用程式名稱)（不安全）」即可——
     因為這是你自己建、只給自己用的測試應用程式。<br>
     註：測試狀態下 Google 的授權每 7 天會過期。想一勞永逸，到
@@ -346,13 +354,21 @@ label{font-size:13px;color:#555;display:block;margin:10px 0 4px}
       <label>文章標題</label><input type="text" id="ptitle">
       <label>預覽（貼進 Blogger 後長這樣）</label>
       <iframe id="pv"></iframe>
-      <p><button id="pub" onclick="publish()" disabled>推送草稿到 Blogger</button>
+      <p><button class="primary" id="pub" onclick="publish()" disabled>推送草稿到 Blogger</button>
          <span id="pubMsg"></span></p>
     </div>
   </div>
 </div>
 </main>
 <script>
+const THEMES=["auto","light","dark"],THEME_NAMES={auto:"自動",light:"淺色",dark:"深色"};
+function applyTheme(){const t=localStorage.theme||"auto";
+  if(t==="auto")delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme=t;
+  document.getElementById("theme-btn").textContent="主題："+THEME_NAMES[t];}
+function cycleTheme(){const t=localStorage.theme||"auto";
+  localStorage.theme=THEMES[(THEMES.indexOf(t)+1)%THEMES.length];applyTheme();}
+applyTheme();
 let curId=null;
 const $=id=>document.getElementById(id);
 function show(id){for(const s of ['setup','blogpick','workbench'])$(s).style.display=s===id?'':'none';}
