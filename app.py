@@ -31,7 +31,8 @@ def save_cfg(cfg):
 # ---------- Heptabase CLI ----------
 
 def run_cli(*args):
-    p = subprocess.run([CLI, *args], capture_output=True)
+    p = subprocess.run([CLI, *args], capture_output=True,
+                       creationflags=subprocess.CREATE_NO_WINDOW)
     if p.returncode != 0:
         raise RuntimeError(p.stderr.decode("utf-8", "replace") or "heptabase CLI 失敗（桌面 App 有開嗎？）")
     return json.loads(p.stdout.decode("utf-8", "replace"))
