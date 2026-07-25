@@ -35,8 +35,9 @@ upload them in the Blogger editor.
 
 ## Setup
 
-1. `python app.py` (or double-click `start.bat` on Windows). It opens
-   `http://localhost:8822` in your browser.
+1. `python app.py`, which serves `http://localhost:8822` (open it in your
+   browser). On Windows, double-clicking `launch_blogger.vbs` instead starts
+   it fully hidden — no console window — and opens the browser for you.
 2. Follow the in-app wizard. On the current (2025–2026) Google Cloud Console
    the old "OAuth consent screen" now lives under **Google Auth Platform**:
    - Create a project in [Google Cloud Console](https://console.cloud.google.com/projectcreate) and switch to it
@@ -123,8 +124,9 @@ JSON，轉成**全 inline style** 的 Blogger-safe HTML（這樣 Blogger 佈景�
 
 ### 設定
 
-1. 執行 `python app.py`（Windows 可雙擊 `start.bat`），會自動開啟
-   `http://localhost:8822`。
+1. 執行 `python app.py`，伺服器會開在 `http://localhost:8822`（用瀏覽器打開）。
+   Windows 使用者可改雙擊 `launch_blogger.vbs`：完全隱藏執行、不跳出主控台視窗，
+   並自動開啟瀏覽器。
 2. 跟著頁面上的精靈操作。注意 Google 在 2025–2026 改版，舊的「OAuth 同意畫面」
    已整併進「**Google 驗證平台**」（第一次進去會跳「開始使用」精靈）：
    - 在 [Google Cloud Console](https://console.cloud.google.com/projectcreate) 建立專案並切換過去

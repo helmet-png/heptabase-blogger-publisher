@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Heptabase → Blogger 草稿發布器（純標準庫）。py app.py → http://localhost:8822"""
-import json, os, sys, time, threading, subprocess, urllib.parse, urllib.request, urllib.error, webbrowser
+import json, os, sys, time, subprocess, urllib.parse, urllib.request, urllib.error
 import html as H
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
@@ -546,8 +546,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"Hepta → Blogger 發布器：http://localhost:{PORT}")
-    threading.Timer(0.8, lambda: webbrowser.open(f"http://localhost:{PORT}")).start()
+    if sys.stdout:
+        print(f"Hepta → Blogger 發布器：http://localhost:{PORT}")
     srv.serve_forever()
 
 if __name__ == "__main__":
