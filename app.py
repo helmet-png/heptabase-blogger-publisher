@@ -373,7 +373,15 @@ applyTheme();
 let curId=null;
 const $=id=>document.getElementById(id);
 function show(id){for(const s of ['setup','blogpick','workbench'])$(s).style.display=s===id?'':'none';}
-async function j(url,opts){const r=await fetch(url,opts);const d=await r.json();if(!r.ok)throw new Error(d.error||r.status);return d;}
+async function j(url,opts){
+  const r=await fetch(url,opts);const d=await r.json();
+  if(!r.ok){
+    const msg=d.error||String(r.status);
+    if(msg.includes('invalid_grant')){location.href='/auth';throw new Error('授權已失效，正在導向重新授權…');}
+    throw new Error(msg);
+  }
+  return d;
+}
 async function init(){
   const s=await j('/api/state');
   if(!s.configured){show('setup');return;}
