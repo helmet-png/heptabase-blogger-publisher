@@ -62,20 +62,33 @@ def highlight_quote_html(hid):
     src, text = highlight_text(hid)
     if not text:
         return None
-    cap = (f'<div style="font-size:0.82em;color:#8a6d00;margin-top:6px;font-style:normal">— {esc(src)}</div>'
+    cap = (f'<div style="font-size:0.82em;opacity:.65;margin-top:6px;font-style:normal">— {esc(src)}</div>'
            if src else "")
-    return (f'<blockquote style="background:#fff9db;border-left:3px solid #f0b400;border-radius:3px;'
+    return (f'<blockquote style="background:{HIGHLIGHT_BG};border-left:3px solid #f0b400;border-radius:3px;'
             f'padding:10px 16px;margin:0 0 12px;font-style:italic">「{esc(text)}」{cap}</blockquote>')
 
 # ---------- ProseMirror → Blogger-safe HTML（全 inline style） ----------
+#
+# 讀者頁面可能是淺色也可能是深色主題（文字顏色會直接繼承頁面本身），所以這裡一律用
+# 半透明 rgba 當背景色、不強制指定文字顏色——讓文字保留頁面原本就讀得到的顏色，
+# 半透明色塊疊上去在深色/淺色背景下都still看得出色調。純文字強調色（如 caption）
+# 改用 opacity 調淡「目前繼承色」而不是換成寫死的色碼，同樣兩種主題都安全。
 
-TEXT_COLORS = {"red": "#e03e3e", "orange": "#d9730d", "yellow": "#b8860b", "green": "#0f7b6c",
-               "blue": "#0b6e99", "purple": "#6940a5", "pink": "#ad1a72", "brown": "#64473a",
-               "gray": "#787774", "grey": "#787774"}
-BG_COLORS = {"red": "#ffd6d6", "orange": "#ffe0c2", "yellow": "#ffec99", "green": "#d3f0e0",
-             "blue": "#d3e5ef", "purple": "#e4d9f5", "pink": "#f8d8e7", "brown": "#e9dcd3",
-             "gray": "#e8e8e8", "grey": "#e8e8e8"}
-CODE_STYLE = "background:#f2f2f2;padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:0.9em"
+HIGHLIGHT_BG = "rgba(255,214,0,.32)"   # 螢光筆黃
+NEUTRAL_BG = "rgba(135,131,120,.16)"   # 中性灰底（code / 表格表頭）
+NEUTRAL_BORDER = "rgba(135,131,120,.35)"
+
+# ponytail: Heptabase 的文字色與背景色 mark 原本分開處理（純文字色 vs 淡色底），
+# 但純文字色是寫死色碼，在深色頁面上可能整個看不見；兩種一律改成同一種半透明色塊
+# 呈現，犧牲一點「文字色 vs 背景色」的原始語意，換取任何主題下都讀得到。
+COLOR_HUES = {"red": "255,72,72", "orange": "245,158,11", "yellow": "217,180,10",
+              "green": "16,160,110", "blue": "14,142,196", "purple": "142,102,225",
+              "pink": "222,80,150", "brown": "150,110,80", "gray": "150,150,150", "grey": "150,150,150"}
+
+def color_tint(c):
+    return f"rgba({COLOR_HUES.get(c, '150,150,150')},.28)"
+
+CODE_STYLE = f"background:{NEUTRAL_BG};padding:1px 5px;border-radius:3px;font-family:Consolas,monospace;font-size:0.9em"
 
 def esc(s):
     return H.escape(s or "", quote=False)
@@ -98,13 +111,10 @@ def render_text(node):
             href = H.escape(a.get("href", "#"), quote=True)
             t = f'<a href="{href}" target="_blank">{t}</a>'
         elif mt == "highlight":
-            t = f'<mark style="background:#ffec99;padding:0 2px">{t}</mark>'
+            t = f'<mark style="background:{HIGHLIGHT_BG};color:inherit;padding:0 2px">{t}</mark>'
         elif mt == "color":
             c = str(a.get("color") or "").lower()
-            if "background" in str(a.get("type") or "") or "highlight" in str(a.get("type") or ""):
-                t = f'<span style="background:{BG_COLORS.get(c, c)};padding:0 2px">{t}</span>'
-            else:
-                t = f'<span style="color:{TEXT_COLORS.get(c, c)}">{t}</span>'
+            t = f'<span style="background:{color_tint(c)};padding:0 2px">{t}</span>'
     return t
 
 def math_src(node):
@@ -115,7 +125,7 @@ def math_src(node):
 def image_placeholder(node):
     a = node.get("attrs") or {}
     label = a.get("alt") or a.get("title") or ""
-    return ('<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;color:#888;margin:12px 0">'
+    return ('<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;opacity:.7;margin:12px 0">'
             f'圖片未匯入{("：" + esc(label)) if label else ""}（請在 Blogger 編輯器手動上傳）</div>')
 
 def render_inline(nodes, state):
@@ -136,8 +146,8 @@ def render_inline(nodes, state):
             out.append(image_placeholder(n))
         elif t == "highlight_element":
             _src, text = highlight_text((n.get("attrs") or {}).get("highlightElementId", ""))
-            out.append(f'<mark style="background:#ffec99;padding:0 3px;border-radius:2px">{esc(text)}</mark>'
-                       if text else '<span style="color:#c00;font-size:0.85em">〔highlight 讀取失敗〕</span>')
+            out.append(f'<mark style="background:{HIGHLIGHT_BG};color:inherit;padding:0 3px;border-radius:2px">{esc(text)}</mark>'
+                       if text else '<span style="font-size:0.85em;opacity:.7">〔⚠ highlight 讀取失敗〕</span>')
         else:
             out.append(render_inline(n.get("content"), state))
     return "".join(out)
@@ -165,8 +175,8 @@ def render_table(node, state):
         cells = []
         for cell in row.get("content") or []:
             tag = "th" if cell.get("type") == "table_header" else "td"
-            extra = "background:#f5f5f5;font-weight:bold;" if tag == "th" else ""
-            cells.append(f'<{tag} style="border:1px solid #ccc;padding:5px 9px;{extra}text-align:left">'
+            extra = f"background:{NEUTRAL_BG};font-weight:bold;" if tag == "th" else ""
+            cells.append(f'<{tag} style="border:1px solid {NEUTRAL_BORDER};padding:5px 9px;{extra}text-align:left">'
                          f'{render_blocks(cell.get("content"), state)}</{tag}>')
         rows.append(f"<tr>{''.join(cells)}</tr>")
     return ('<div style="overflow-x:auto"><table style="border-collapse:collapse;margin:0 0 12px">'
@@ -182,11 +192,11 @@ def render_block(n, state):
         lv = min(int(a.get("level", 1)) + 1, 6)  # 內文 H1 讓給文章標題，整體降一級
         return f'<h{lv}>{render_inline(n.get("content"), state)}</h{lv}>'
     if t == "blockquote":
-        return ('<blockquote style="border-left:3px solid #ccc;margin:0 0 12px;padding:2px 0 2px 14px;color:#555">'
-                f'{render_blocks(n.get("content"), state)}</blockquote>')
+        return (f'<blockquote style="background:{NEUTRAL_BG};border-left:3px solid {NEUTRAL_BORDER};'
+                f'margin:0 0 12px;padding:6px 14px">{render_blocks(n.get("content"), state)}</blockquote>')
     if t in ("code_block", "codeBlock"):
         code = "".join(c.get("text", "") for c in n.get("content") or [])
-        return ('<pre style="background:#f6f6f6;border:1px solid #e2e2e2;border-radius:4px;padding:10px;'
+        return (f'<pre style="background:{NEUTRAL_BG};border:1px solid {NEUTRAL_BORDER};border-radius:4px;padding:10px;'
                 'overflow-x:auto;font-family:Consolas,monospace;font-size:0.9em;margin:0 0 12px">'
                 f"{esc(code)}</pre>")
     if t == "math_display":
@@ -201,7 +211,7 @@ def render_block(n, state):
     if t == "highlight_element":
         content = n.get("content")
         if content:
-            return ('<div style="background:#fff9db;border-left:3px solid #fab005;border-radius:3px;'
+            return (f'<div style="background:{HIGHLIGHT_BG};border-left:3px solid #fab005;border-radius:3px;'
                     f'padding:8px 12px;margin:0 0 12px">{render_blocks(content, state)}</div>')
         return highlight_quote_html(a.get("highlightElementId", "")) or ""
     if t == "card":
@@ -212,7 +222,7 @@ def render_block(n, state):
             html = highlight_quote_html(a.get("objectId", ""))
             if html:
                 return html
-        return (f'<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;color:#888;margin:12px 0">'
+        return (f'<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;opacity:.7;margin:12px 0">'
                 f'嵌入內容（{esc(a.get("objectType", "object"))}）未匯入</div>')
     if t in LIST_KINDS:
         return render_list(t, [n], state)
