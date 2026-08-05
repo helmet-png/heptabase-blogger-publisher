@@ -46,6 +46,27 @@ def card_title(cid):
             _title_cache[cid] = "(卡片)"
     return _title_cache[cid]
 
+_highlight_cache = {}
+def highlight_text(hid):
+    """highlightElement 卡片的 title 存的是「來源卡片標題 → 被 highlight 的文字」，回傳 (來源, 文字)。"""
+    if hid not in _highlight_cache:
+        try:
+            title = run_cli("card", "properties", hid).get("title") or ""
+            src, sep, text = title.partition(" → ")
+            _highlight_cache[hid] = (src, text) if sep else ("", title)
+        except Exception:
+            _highlight_cache[hid] = ("", "")
+    return _highlight_cache[hid]
+
+def highlight_quote_html(hid):
+    src, text = highlight_text(hid)
+    if not text:
+        return None
+    cap = (f'<div style="font-size:0.82em;color:#8a6d00;margin-top:6px;font-style:normal">— {esc(src)}</div>'
+           if src else "")
+    return (f'<blockquote style="background:#fff9db;border-left:3px solid #f0b400;border-radius:3px;'
+            f'padding:10px 16px;margin:0 0 12px;font-style:italic">「{esc(text)}」{cap}</blockquote>')
+
 # ---------- ProseMirror → Blogger-safe HTML（全 inline style） ----------
 
 TEXT_COLORS = {"red": "#e03e3e", "orange": "#d9730d", "yellow": "#b8860b", "green": "#0f7b6c",
@@ -113,6 +134,10 @@ def render_inline(nodes, state):
             out.append(f'<span style="border-bottom:1px dashed #999">{esc(title)}</span>')
         elif t == "image":
             out.append(image_placeholder(n))
+        elif t == "highlight_element":
+            _src, text = highlight_text((n.get("attrs") or {}).get("highlightElementId", ""))
+            out.append(f'<mark style="background:#ffec99;padding:0 3px;border-radius:2px">{esc(text)}</mark>'
+                       if text else '<span style="color:#c00;font-size:0.85em">〔highlight 讀取失敗〕</span>')
         else:
             out.append(render_inline(n.get("content"), state))
     return "".join(out)
@@ -174,12 +199,19 @@ def render_block(n, state):
     if t == "image":
         return image_placeholder(n)
     if t == "highlight_element":
-        return ('<div style="background:#fff9db;border-left:3px solid #fab005;border-radius:3px;'
-                f'padding:8px 12px;margin:0 0 12px">{render_blocks(n.get("content"), state)}</div>')
+        content = n.get("content")
+        if content:
+            return ('<div style="background:#fff9db;border-left:3px solid #fab005;border-radius:3px;'
+                    f'padding:8px 12px;margin:0 0 12px">{render_blocks(content, state)}</div>')
+        return highlight_quote_html(a.get("highlightElementId", "")) or ""
     if t == "card":
         title = card_title(a.get("cardId", ""))
         return f'<p style="margin:0 0 12px;border-bottom:1px dashed #999;display:inline-block">{esc(title)}</p>'
     if t == "embed":
+        if a.get("objectType") == "highlightElement":
+            html = highlight_quote_html(a.get("objectId", ""))
+            if html:
+                return html
         return (f'<div style="border:1px dashed #bbb;border-radius:4px;padding:10px;color:#888;margin:12px 0">'
                 f'嵌入內容（{esc(a.get("objectType", "object"))}）未匯入</div>')
     if t in LIST_KINDS:
